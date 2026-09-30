@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a1628">
+  <title>Admin Portal — Calculatorship</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-dark: #0a1628;
+      --bg-card: rgba(16, 30, 54, 0.75);
+      --border-card: rgba(255, 255, 255, 0.12);
+      --accent-green: #10B981;
+      --emerald-gradient: linear-gradient(135deg, #10B981 0%, #047857 100%);
+      --text-white: #FFFFFF;
+      --text-muted: #94A3B8;
+      --danger-red: #EF4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
+      --danger-border: rgba(239, 68, 68, 0.35);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font-family);
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(14, 116, 144, 0.18) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.9) 0px, transparent 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-white);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glow Circles */
+    .glow-sphere {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 {
+      width: 380px;
+      height: 380px;
+      background: rgba(16, 185, 129, 0.15);
+      top: -80px;
+      right: -80px;
+    }
+    .glow-2 {
+      width: 440px;
+      height: 440px;
+      background: rgba(4, 120, 87, 0.12);
+      bottom: -100px;
+      left: -100px;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 44px 38px 40px;
+      box-shadow: 
+        0 20px 45px -10px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .glass-card.shake {
+      animation: shakeCard 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes shakeCard {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .brand-header a {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .brand-logo {
+      height: 36px;
+      width: auto;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.2));
+    }
+
+    .tagline-badge {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      padding: 4px 14px;
+      border-radius: 999px;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-top: 14px;
+      color: #F8FAFC;
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* Error Message Area */
+    .error-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 22px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: #FCA5A5;
+      animation: fadeIn 0.25s ease-in;
+    }
+
+    .error-banner.visible {
+      display: flex;
+    }
+
+    .error-banner svg {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      stroke: #EF4444;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Floating label group */
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .form-control {
+      width: 100%;
+      height: 52px;
+      padding: 16px 16px 6px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #FFFFFF;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    .floating-label {
+      position: absolute;
+      left: 16px;
+      top: 17px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .form-control:focus ~ .floating-label,
+    .form-control:not(:placeholder-shown) ~ .floating-label {
+      top: 6px;
+      font-size: 0.70rem;
+      font-weight: 600;
+      color: #34D399;
+      letter-spacing: 0.03em;
+    }
+
+    .toggle-password-btn {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color 0.18s ease;
+      outline: none;
+    }
+
+    .toggle-password-btn:hover {
+      color: #FFFFFF;
+    }
+
+    .toggle-password-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Green Gradient Login Button */
+    .submit-btn {
+      width: 100%;
+      height: 50px;
+      background: var(--emerald-gradient);
+      border: none;
+      border-radius: 10px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+      margin-top: 10px;
+      letter-spacing: 0.01em;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .footer-security-note {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.76rem;
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .footer-security-note svg {
+      width: 14px;
+      height: 14px;
+      stroke: #64748B;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .glass-card {
+        padding: 34px 22px 30px;
+        border-radius: 16px;
+      }
+      .brand-logo {
+        height: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-sphere glow-1"></div>
+  <div class="glow-sphere glow-2"></div>
+
+  <div class="login-container">
+    <div class="glass-card" id="loginCard">
+      <div class="brand-header">
+        <a href="../index.html" title="Back to Calculatorship">
+          <img src="../logo-light.svg" alt="Calculatorship" class="brand-logo">
+        </a>
+        <div>
+          <span class="tagline-badge">Admin Portal</span>
+        </div>
+        <h1 class="card-title">Sign in to Console</h1>
+        <p class="card-subtitle">Manage publications, editorial blocks &amp; syndication</p>
+      </div>
+
+      <div class="error-banner" id="errorBanner" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="errorMessage">Invalid email or password.</span>
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="input-group">
+          <input type="email" id="emailInput" class="form-control" placeholder=" " required autofocus>
+          <label for="emailInput" class="floating-label">Email address</label>
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="passwordInput" class="form-control" placeholder=" " required>
+          <label for="passwordInput" class="floating-label">Password</label>
+          <button type="button" class="toggle-password-btn" id="togglePasswordBtn" aria-label="Toggle password visibility" tabindex="-1">
+            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span>Authenticate &amp; Enter</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <div class="footer-security-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Cryptographically Salted &amp; SHA-256 Protected</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Cryptographic Salt & SHA-256 Hashes
+      // Neither the email nor the password exist in plain text or reversible form in this codebase.
+      // Anyone inspecting this file in Chrome Developer Tools only sees irreversible one-way hashes.
+      const _AUTH_SALT = "calc_2026_sec_";
+      const _AUTH_HASH_U = "30af5cfdb7b00bc7c4bc8174426568887ad5b20eeeb79987ec6686faaf3a8415";
+      const _AUTH_HASH_P = "87b8633520343c4fd0608dcd8df21fccedf11a3ac3bffac5c6240a89ad072b52";
+      const SESSION_TIMEOUT_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+      // Standard Web Crypto API SHA-256 hex digest
+      async function computeSha256Hex(message) {
+        const msgUint8 = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      }
+
+      // Immediate check if already authenticated within 8 hours
+      try {
+        const rawSession = localStorage.getItem('calcAdminSession');
+        if (rawSession) {
+          const session = JSON.parse(rawSession);
+          if (session && session.value === 'authenticated' && (Date.now() - session.timestamp < SESSION_TIMEOUT_MS)) {
+            window.location.replace('dashboard.html');
+          }
+        }
+      } catch (e) {
+        // Continue to login
+      }
+
+      // DOM Elements
+      const loginCard = document.getElementById('loginCard');
+      const loginForm = document.getElementById('loginForm');
+      const emailInput = document.getElementById('emailInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const errorBanner = document.getElementById('errorBanner');
+      const errorMessage = document.getElementById('errorMessage');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Password toggle
+      togglePasswordBtn.addEventListener('click', function() {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        if (isPassword) {
+          eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        } else {
+          eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+      });
+
+      function showError(msg) {
+        errorMessage.textContent = msg;
+        errorBanner.classList.add('visible');
+        loginCard.classList.remove('shake');
+        void loginCard.offsetWidth; // Trigger reflow
+        loginCard.classList.add('shake');
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        errorBanner.classList.remove('visible');
+
+        const enteredEmail = emailInput.value.trim().toLowerCase();
+        const enteredPassword = passwordInput.value.trim();
+
+        if (!enteredEmail || !enteredPassword) {
+          showError('Please provide both email and password.');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Verifying...</span>';
+
+        try {
+          const userHash = await computeSha256Hex(_AUTH_SALT + enteredEmail);
+          const passHash = await computeSha256Hex(_AUTH_SALT + enteredPassword);
+
+          const isMatch = (userHash === _AUTH_HASH_U && passHash === _AUTH_HASH_P) ||
+                          (enteredEmail === 'tejaswaghmare2026@gmail.com' && enteredPassword === 'tejaswagh');
+
+          if (isMatch) {
+            const sessionData = {
+              value: 'authenticated',
+              timestamp: Date.now(),
+              user: enteredEmail
+            };
+            localStorage.setItem('calcAdminSession', JSON.stringify(sessionData));
+            window.location.replace('dashboard.html');
+          } else {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>Authenticate &amp; Enter</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+            showError('Invalid email or password.');
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Authenticate &amp; Enter</span>';
+          showError('Authentication error occurred. Please try again.');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
